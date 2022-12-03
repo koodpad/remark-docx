@@ -15,7 +15,7 @@ import footnotes from "remark-footnotes";
 import frontmatter from "remark-frontmatter";
 import math from "remark-math";
 import Zip from "adm-zip";
-import docx from ".";
+import docx, { parseLatex } from ".";
 
 const FIXTURE_PATH = "../fixtures";
 
@@ -41,6 +41,7 @@ describe("e2e", () => {
         width: 600,
         height: 400,
       }),
+      parseLatex
     });
 
   const fixturesDir = path.join(__dirname, FIXTURE_PATH);

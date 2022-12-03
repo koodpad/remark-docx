@@ -22,7 +22,6 @@ import {
 } from "docx";
 import type { IPropertiesOptions } from "docx/build/file/core-properties";
 import type * as mdast from "./models/mdast";
-import { parseLatex } from "./latex";
 import { invariant, unreachable } from "./utils";
 
 const ORDERED_LIST_REF = "ordered";
@@ -116,6 +115,7 @@ type Context = Readonly<{
   images: ImageDataMap;
   indent: number;
   list?: ListInfo;
+  parseLatex?: (text: string) => Math[][]
 }>;
 
 export interface DocxOptions
@@ -133,12 +133,18 @@ export interface DocxOptions
   > {
   /**
    * Set output type of `VFile.result`. `buffer` is `Promise<Buffer>`. `blob` is `Promise<Blob>`.
+   * `doc` is `Promis<Document>`. `nodes` is `Promise<DocxChild[]>`.
    */
-  output?: "buffer" | "blob";
+  output?: "buffer" | "blob" | "doc" | "nodes";
   /**
    * **You must set** if your markdown includes images. See example for [browser](https://github.com/inokawa/remark-docx/blob/main/stories/playground.stories.tsx) and [Node.js](https://github.com/inokawa/remark-docx/blob/main/src/index.spec.ts).
    */
   imageResolver?: ImageResolver;
+  /**
+   * Optional builder for parsing latex. This can be imported as `import { parseLatex } from "remark-docx"`.
+   * It is injected here to avoid bundling latex code when not needed.
+   */
+  parseLatex?: (text: string) => Math[][];
 }
 
 type DocxChild = Paragraph | Table | TableOfContents;
@@ -167,14 +173,16 @@ export const mdastToDocx = async (
     revision,
     styles,
     background,
+    parseLatex: mathBuilder
   }: DocxOptions,
-  images: ImageDataMap
+  images: ImageDataMap,
 ): Promise<any> => {
   const { nodes, footnotes } = convertNodes(node.children, {
     deco: {},
     images,
     indent: 0,
-  });
+    parseLatex: mathBuilder
+  }) as DocxChild[];
   const doc = new Document({
     title,
     subject,
@@ -206,6 +214,10 @@ export const mdastToDocx = async (
       return typeof Buffer === "function" ? Buffer.from(bufOut) : bufOut;
     case "blob":
       return Packer.toBlob(doc);
+    case "doc":
+      return new Promise(resolve => resolve(doc))
+    case "nodes":
+      return new Promise(resolve => resolve(nodes))
   }
 };
 
@@ -300,10 +312,10 @@ const convertNodes = (
         results.push(buildFootnoteReference(node));
         break;
       case "math":
-        results.push(...buildMath(node));
+        results.push(...buildMath(node, ctx));
         break;
       case "inlineMath":
-        results.push(buildInlineMath(node));
+        results.push(buildInlineMath(node, ctx));
         break;
       default:
         unreachable(node);
@@ -483,8 +495,8 @@ const buildCode = ({ value, lang: _lang, meta: _meta }: mdast.Code) => {
   });
 };
 
-const buildMath = ({ value }: mdast.Math) => {
-  return parseLatex(value).map(
+const buildMath = ({ value }: mdast.Math, ctx: Context) => {
+  return ctx.parseLatex ? ctx.parseLatex(value).map(
     (runs) =>
       new Paragraph({
         children: [
@@ -493,13 +505,13 @@ const buildMath = ({ value }: mdast.Math) => {
           }),
         ],
       })
-  );
+  ): [new Paragraph({ children: [ new TextRun(value)] })];
 };
 
-const buildInlineMath = ({ value }: mdast.InlineMath) => {
-  return new Math({
-    children: parseLatex(value).flatMap((runs) => runs),
-  });
+const buildInlineMath = ({ value }: mdast.InlineMath, ctx: Context) => {
+  return ctx.parseLatex ? new Math({
+    children: ctx.parseLatex(value).flatMap((runs) => runs)
+  }) : new TextRun(value);
 };
 
 const buildText = (text: string, deco: Decoration) => {
