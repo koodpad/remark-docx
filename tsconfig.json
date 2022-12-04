@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2018",
+    "composite": true,
     "module": "esnext",
     "moduleResolution": "node",
     "lib": ["esnext"],
