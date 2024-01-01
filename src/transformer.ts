@@ -24,6 +24,9 @@ import type { IPropertiesOptions } from "docx/build/file/core-properties";
 import type * as mdast from "./models/mdast";
 import { invariant, unreachable } from "./utils";
 
+type THeadingLevel = typeof HeadingLevel[keyof typeof HeadingLevel];
+type TAlignmentType = typeof AlignmentType[keyof typeof AlignmentType];
+
 const ORDERED_LIST_REF = "ordered";
 const INDENT = 0.5;
 const DEFAULT_NUMBERINGS: ILevelsOptions[] = [
@@ -182,7 +185,7 @@ export const mdastToDocx = async (
     images,
     indent: 0,
     parseLatex: mathBuilder
-  }) as DocxChild[];
+  });
   const doc = new Document({
     title,
     subject,
@@ -366,7 +369,7 @@ const buildParagraph = ({ children }: mdast.Paragraph, ctx: Context) => {
 };
 
 const buildHeading = ({ children, depth }: mdast.Heading, ctx: Context) => {
-  let heading: HeadingLevel;
+  let heading: THeadingLevel;
   switch (depth) {
     case 1:
       heading = HeadingLevel.TITLE;
@@ -433,7 +436,7 @@ const buildListItem = (
 };
 
 const buildTable = ({ children, align }: mdast.Table, ctx: Context) => {
-  const cellAligns: AlignmentType[] | undefined = align?.map((a) => {
+  const cellAligns: TAlignmentType[] | undefined = align?.map((a) => {
     switch (a) {
       case "left":
         return AlignmentType.LEFT;
@@ -456,7 +459,7 @@ const buildTable = ({ children, align }: mdast.Table, ctx: Context) => {
 const buildTableRow = (
   { children }: mdast.TableRow,
   ctx: Context,
-  cellAligns: AlignmentType[] | undefined
+  cellAligns: TAlignmentType[] | undefined
 ) => {
   return new TableRow({
     children: children.map((c, i) => {
@@ -468,7 +471,7 @@ const buildTableRow = (
 const buildTableCell = (
   { children }: mdast.TableCell,
   ctx: Context,
-  align: AlignmentType | undefined
+  align: TAlignmentType | undefined
 ) => {
   const { nodes } = convertNodes(children, ctx);
   return new TableCell({
