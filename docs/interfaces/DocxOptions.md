@@ -12,6 +12,7 @@
 
 - [output](DocxOptions.md#output)
 - [imageResolver](DocxOptions.md#imageresolver)
+- [parseLatex](DocxOptions.md#parselatex)
 - [title](DocxOptions.md#title)
 - [subject](DocxOptions.md#subject)
 - [creator](DocxOptions.md#creator)
@@ -26,13 +27,14 @@
 
 ### output
 
-• `Optional` **output**: ``"buffer"`` \| ``"blob"``
+• `Optional` **output**: ``"buffer"`` \| ``"blob"`` \| ``"doc"`` \| ``"nodes"``
 
 Set output type of `VFile.result`. `buffer` is `Promise<Buffer>`. `blob` is `Promise<Blob>`.
+`doc` is `Promis<Document>`. `nodes` is `Promise<DocxChild[]>`.
 
 #### Defined in
 
-[src/transformer.ts:137](https://github.com/inokawa/remark-docx/blob/63506a6/src/transformer.ts#L137)
+[src/transformer.ts:141](https://github.com/koodpad/remark-docx/blob/f67570d/src/transformer.ts#L141)
 
 ___
 
@@ -44,7 +46,34 @@ ___
 
 #### Defined in
 
-[src/transformer.ts:141](https://github.com/inokawa/remark-docx/blob/63506a6/src/transformer.ts#L141)
+[src/transformer.ts:145](https://github.com/koodpad/remark-docx/blob/f67570d/src/transformer.ts#L145)
+
+___
+
+### parseLatex
+
+• `Optional` **parseLatex**: (`text`: `string`) => `Math`[][]
+
+#### Type declaration
+
+▸ (`text`): `Math`[][]
+
+Optional builder for parsing latex. This can be imported as `import { parseLatex } from "remark-docx"`.
+It is injected here to avoid bundling latex code when not needed.
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `text` | `string` |
+
+##### Returns
+
+`Math`[][]
+
+#### Defined in
+
+[src/transformer.ts:150](https://github.com/koodpad/remark-docx/blob/f67570d/src/transformer.ts#L150)
 
 ___
 
@@ -58,7 +87,7 @@ Pick.title
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:12
+node_modules/docx/build/file/core-properties/properties.d.ts:13
 
 ___
 
@@ -72,7 +101,7 @@ Pick.subject
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:13
+node_modules/docx/build/file/core-properties/properties.d.ts:14
 
 ___
 
@@ -86,7 +115,7 @@ Pick.creator
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:14
+node_modules/docx/build/file/core-properties/properties.d.ts:15
 
 ___
 
@@ -100,7 +129,7 @@ Pick.keywords
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:15
+node_modules/docx/build/file/core-properties/properties.d.ts:16
 
 ___
 
@@ -114,7 +143,7 @@ Pick.description
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:16
+node_modules/docx/build/file/core-properties/properties.d.ts:17
 
 ___
 
@@ -128,7 +157,7 @@ Pick.lastModifiedBy
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:17
+node_modules/docx/build/file/core-properties/properties.d.ts:18
 
 ___
 
@@ -142,7 +171,7 @@ Pick.revision
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:18
+node_modules/docx/build/file/core-properties/properties.d.ts:19
 
 ___
 
@@ -156,7 +185,7 @@ Pick.styles
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:20
+node_modules/docx/build/file/core-properties/properties.d.ts:21
 
 ___
 
@@ -170,4 +199,4 @@ Pick.background
 
 #### Defined in
 
-node_modules/docx/build/file/core-properties/properties.d.ts:28
+node_modules/docx/build/file/core-properties/properties.d.ts:29
