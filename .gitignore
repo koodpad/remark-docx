@@ -4,3 +4,6 @@ src/**/*.d.ts
 src/**/*.js
 *.tsbuildinfo
 .rollup.cache
+.yarn/cache
+default.nix
+yarn-project.nix
